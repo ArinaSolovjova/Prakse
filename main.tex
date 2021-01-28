@@ -1,0 +1,129 @@
+\documentclass[12pt,a4paper,oneside]{article}
+
+\usepackage{polyglossia}
+\usepackage{subfiles}
+\usepackage{titlesec}
+\usepackage{minted}
+\usepackage{graphics}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{graphicx}
+
+% Add bibliography
+\usepackage[backend=biber, sorting=none, style=numeric]{biblatex}
+\addbibresource{bibliography.bib}
+
+\usepackage{mathtools}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+% %
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+\usepackage{placeins}
+\usepackage{flafter}
+
+
+\usepackage{lipsum}
+\usepackage{setspace}
+
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    total={170mm,257mm},
+    left=20mm,
+    top=20mm,
+    left=22mm,
+    right=20mm,
+}
+
+% Set line spacing
+\renewcommand{\baselinestretch}{1.5}
+
+% Disable spacing around list items
+\usepackage{enumitem}
+\setlist{nosep}
+
+% Set font
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\setdefaultlanguage{latvian}
+\SetLanguageKeys{latvian}{indentfirst=true}
+
+
+\sloppy
+\usepackage{fixlatvian}
+
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        \begin{figure}[ht]
+            \centering
+            \includegraphics[width=60mm]{pics/vea_logo.png}
+        \end{figure}
+        \large
+        \textbf{Ventspils Augstskola \\Informācijas tehnoloģiju fakultāte}
+        \vspace*{4cm}
+        \\
+        \textbf{Prakses darba atskaite} \\
+        \LARGE
+        \textbf{Nosaukums}
+        \vspace{0.5cm}
+        \large
+        \\
+    \end{center}
+
+    \vspace{2cm}
+
+    \begin{flushright}
+        \normalsize
+        \textbf{Izstrādāja:}\\
+        Bakalaura studiju programmas “Datorzinātnes”\\
+        3. kursa students /(-e)\\
+        Vārds Uzvārds \\
+    \end{flushright}
+
+    \vfill
+
+    \begin{center}
+        \Large
+        Ventspils, 2021
+    \end{center}
+
+\end{titlepage}
+
+% Sections
+\newpage
+\section*{\centering Anotācija}
+\input{sections/anotacija.tex}
+
+\newpage
+\section*{\centering Abstract}
+\input{sections/abstract.tex}
+
+\clearpage
+\tableofcontents
+\clearpage
+
+\newpage
+\section{Ievads}
+\input{sections/ievads.tex}
+
+\newpage
+\section{Secinājumi}
+\input{sections/secinajumi.tex}
+
+\newpage
+\section{Iespējamie uzlabojumi un turpmākā darbība}
+\input{sections/uzlabojumi.tex}
+
+\newpage
+\printbibliography
+
+\end{document}
