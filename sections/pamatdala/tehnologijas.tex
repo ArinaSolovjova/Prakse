@@ -1,0 +1,56 @@
+\subsection{Izmantotās tehnoloģijas}
+\par Klases ir veidotas programmēšanas valodā \textit{Java}.
+\par Kā programmēsanas koda rediģēšanas aplikācija tiek izmantota \textit{Eclipse IDE}.
+\par \textbf{Apache Groovy} ir objektorientēta programmēšanas valoda \textit{Java} platformai.
+\par \textbf{Smooks} ir programmēšanas valodas Java ietvars XML, CSV, EDI, Java un citu datu tipu apstrādei. Ar šo ietvaru tiek veikta ievaddatu kartēšana atbilstošajās klasēs un to mainīgajos. \textit{Smooks} pēc noklusējuma apstrādā XML datus, kur klašu instances tiek izveidoti uz noteiktiem tagiem un to mainīgo vērtības tiek ielasītas uz apakštagiem.
+
+\par XML datu piemērs
+{
+    \setstretch{1.0}
+    \begin{minted}[]{html}
+    <invoice invoice-date="2020-01-15">
+        <invoice-reference-number>12345</invoice-reference-number
+        <invoice-due-date>2020-02-15</invoice-due-date>
+    </invoice>
+\end{minted}
+}
+\par Java klases piemērs
+{
+    \setstretch{1.0}
+    \begin{minted}[]{java}
+    public class Invoice {
+        private Date creationDate;
+        private Date dueDate;
+        private Long referenceId;
+        private String extraInfo;
+        // ...
+}
+\end{minted}
+}
+\par Smooks kartēšanas kods
+{
+\setstretch{1.0}
+\begin{minted}[]{html}
+    <jb:bean beanId="invoice"
+        class="com.baeldung.smooks.model.Invoice" createOnElement="invoice">
+        <jb:value property="referenceId" data="invoice/invoice-reference-number" />
+        <jb:value property="creationDate"
+            data="invoice/@invoice-date" decoder="Date">
+            <jb:decodeParam name="format">yyyy-MM-dd</jb:decodeParam>
+        </jb:value>
+        <jb:value property="dueDate"
+            data="invoice/dueDate decoder="Date">
+            <jb:decodeParam name="format">yyyy-MM-dd</jb:decodeParam>
+        </jb:value>
+    </jb:bean>
+\end{minted}
+}
+%     \item izmantotās tehnoloģijas
+%     \begin{itemize}
+%         \item smooks
+%         \item apache groovy
+%         \item xsl
+%         \item xml
+%         \item txt
+%         \item csv
+%     \end{itemize}
