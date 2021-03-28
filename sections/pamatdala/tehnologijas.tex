@@ -1,20 +1,27 @@
 \subsection{Izmantotās tehnoloģijas}
-\par Klases ir veidotas programmēšanas valodā \textit{Java}.
+\par Klases ir veidotas programmēšanas valodā \texttt{Java}.
 \par Kā programmēsanas koda rediģēšanas aplikācija tiek izmantota \textit{Eclipse IDE}.
-\par \textbf{Apache Groovy} ir objektorientēta programmēšanas valoda \textit{Java} platformai.
-\par \textbf{Smooks} ir programmēšanas valodas Java ietvars XML, CSV, EDI, Java un citu datu tipu apstrādei. Ar šo ietvaru tiek veikta ievaddatu kartēšana atbilstošajās klasēs un to mainīgajos. \textit{Smooks} pēc noklusējuma apstrādā XML datus, kur klašu instances tiek izveidoti uz noteiktiem tagiem un to mainīgo vērtības tiek ielasītas uz apakštagiem.
 
-\par XML datu piemērs
+\subsubsection{Apache Groovy programmēšanas valoda}
+\par \textbf{Apache Groovy} ir objektorientēta programmēšanas valoda \texttt{Java} platformai.
+
+\subsubsection{Smooks ietvars}
+\par \textbf{Smooks} ir programmēšanas valodas Java ietvars \texttt{XML}, \texttt{CSV}, \texttt{EDI}, \texttt{Java} un citu datu tipu apstrādei. Ar šo ietvaru tiek veikta ievaddatu kartēšana atbilstošajās klasēs un to mainīgajos. \texttt{Smooks} pēc noklusējuma apstrādā \texttt{XML} datus, kur klašu instances tiek izveidoti uz noteiktiem tagiem un to mainīgo vērtības tiek ielasītas uz apakštagiem.
+\par Tehnoloģijas izmantošanai ir nepieciešams iepriekš sagatavot klases, kas būs atbilstošas ielasāmā faila datiem. Piemēram, ienākošais fails satus informāciju par rēķina izdošanas datumu, gala apmaksas temiņu un paša rēķina numuru.
+Ienākošā \texttt{XML} faila datu piemērs:
+
 {
     \setstretch{1.0}
     \begin{minted}[]{html}
     <invoice invoice-date="2020-01-15">
-        <invoice-reference-number>12345</invoice-reference-number
+        <invoice-reference-number>12345</invoice-reference-number>
         <invoice-due-date>2020-02-15</invoice-due-date>
     </invoice>
-\end{minted}
+    \end{minted}
 }
-\par Java klases piemērs
+
+Atbilstoši datiem, ir izveidota klase, kura uzturēs nepieciešamo informāciju noteiktajos mainīgajos.
+\texttt{Java} rēķina klases piemērs:
 {
     \setstretch{1.0}
     \begin{minted}[]{java}
@@ -24,32 +31,36 @@
         private Long referenceId;
         private String extraInfo;
         // ...
-}
+    }
 \end{minted}
 }
-\par Smooks kartēšanas kods
+
+\par Pielietojot \texttt{smooks} sintaksi, ir iespējams izveidot atsevišķu klases instanci, ģenerējot \texttt{java-binding bean} elementu uz noteikta \texttt{XML} faila taga. \texttt{java-binding bean} jeb kodā \texttt{jb:bean} elements pieņem parametrus \textit{beanId}, kas uztur \texttt{bean} nosaukumu, \textit{class}, kas uztur klases atrašanās vietu projektā, un \textit{createOnElement}, kas uztur ienākošā faila taga nosaukumu, uz kuru tiks izveidota klases instance. Iekš \texttt{jb:bean} tiek izveidoti atsevišķi \texttt{java-binding value} elementi, ar kuriem tiek saglabātas klases mainīgo vērtības, veidojot elementus uz noteiktā taga \texttt{XML} failā. \texttt{java-binding value} jeb kodā \texttt{jb:value} elements pieņemt parametrus \textit{property}, kur vērtība atbilst klases mainīgā nosaukumam, un \textit{data}, kas apzīmē ienākošā faila tagu, no kura tiek ielasīta mainīgā vērtība.
+\par Piemērā pirmajā koda rindā tiek izveidota klases \textit{Invoice} instance uz ienākošā faila \texttt{invoice} taga. Klases mainīgie tiek inicializēti turpmākajos \texttt{jb:value} elementos. Sarežģītākiem datu tipiem, kā datums, vērtība tiek apstrādāta, izmantojot dekodēšanas elementu, pierakstot ienākošajā failā esošo datuma formātu. \texttt{Smooks} datu kartēšanas koda piemērs:
 {
 \setstretch{1.0}
-\begin{minted}[]{html}
-    <jb:bean beanId="invoice"
-        class="com.baeldung.smooks.model.Invoice" createOnElement="invoice">
+\begin{minted}[xleftmargin=20pt,linenos,breaklines]{html}
+    <jb:bean beanId="InvoiceBean" class="com.example.smooks.model.Invoice" createOnElement="invoice">
         <jb:value property="referenceId" data="invoice/invoice-reference-number" />
-        <jb:value property="creationDate"
-            data="invoice/@invoice-date" decoder="Date">
+        <jb:value property="creationDate" data="invoice/@invoice-date" decoder="Date">
             <jb:decodeParam name="format">yyyy-MM-dd</jb:decodeParam>
         </jb:value>
-        <jb:value property="dueDate"
-            data="invoice/dueDate decoder="Date">
+        <jb:value property="dueDate" data="invoice/dueDate" decoder="Date">
             <jb:decodeParam name="format">yyyy-MM-dd</jb:decodeParam>
         </jb:value>
     </jb:bean>
 \end{minted}
 }
+
+\par Sagatavojot iepriekš datu ielasīšanai nepieciešamās klases, kā, piemēram, rēķina detaļas, pakalpojuma dalībnieks, u.c, klases, ir iespējams shematiski uzglabāt ienākošos datus, papildinot kodu ar klašu savstarpējo saistīšanu to kompozīcijas gadījumā, atsevišķi apstrādājot datu vērtības, izmantojot \texttt{Java} programmēšanas valodu, rezultātā uzģenerējot saistītas klašu instances, kas uztur visu nepieciešamo informāciju par rēķinu.
+\par Ielasītā faila informācija var tikt izmantota turpmākai datu pārveidei citos failu formātos un nepieciešamajos standartos, \texttt{pdf} failu ģenerēšanai e-pastu izsūtīšanas vai dokumenta printēšanas gadījumos.
+
+
+\subsubsection{XSL}
+\par \texttt{XSL} jeb lapas stila paplašinājuma valoda (angl. Extensible Stylesheet Language) tiek izmantota \texttt{XML} failu ģenerēšanai izvadfailu kartēšanā un  \texttt{pdf} failu ģenerēšanai, izmantojot to kā papildus pielikumu e-pastos vai nosūtot failu uz printēšanu rēķina saņemšanai pastkastē. 
 %     \item izmantotās tehnoloģijas
 %     \begin{itemize}
-%         \item smooks
 %         \item apache groovy
-%         \item xsl
 %         \item xml
 %         \item txt
 %         \item csv
