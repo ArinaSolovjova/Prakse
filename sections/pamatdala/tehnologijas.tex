@@ -54,10 +54,70 @@ Atbilstoši datiem, ir izveidota klase, kura uzturēs nepieciešamo informāciju
 
 \par Sagatavojot iepriekš datu ielasīšanai nepieciešamās klases, kā, piemēram, rēķina detaļas, pakalpojuma dalībnieks, u.c, klases, ir iespējams shematiski uzglabāt ienākošos datus, papildinot kodu ar klašu savstarpējo saistīšanu to kompozīcijas gadījumā, atsevišķi apstrādājot datu vērtības, izmantojot \texttt{Java} programmēšanas valodu, rezultātā uzģenerējot saistītas klašu instances, kas uztur visu nepieciešamo informāciju par rēķinu.
 \par Ielasītā faila informācija var tikt izmantota turpmākai datu pārveidei citos failu formātos un nepieciešamajos standartos, \texttt{pdf} failu ģenerēšanai e-pastu izsūtīšanas vai dokumenta printēšanas gadījumos.
-
+\par \texttt{Smooks} var tikt izmantots arī izvadfailu kartēšanai, kur tiek ģenerēts fails, izmantojot saglabāto informāciju par rēķinu. \texttt{CSV} faila ģenerēšanai jānosaka nepieciešamo datu uzrādīšanas secību, izmantojot informāciju no izveidoto klašu instancēm.
 
 \subsubsection{XSL}
-\par \texttt{XSL} jeb lapas stila paplašinājuma valoda (angl. Extensible Stylesheet Language) tiek izmantota \texttt{XML} failu ģenerēšanai izvadfailu kartēšanā un  \texttt{pdf} failu ģenerēšanai, izmantojot to kā papildus pielikumu e-pastos vai nosūtot failu uz printēšanu rēķina saņemšanai pastkastē. 
+\par \texttt{XSL} jeb lapas stila paplašinājuma valoda (angl. Extensible Stylesheet Language) tiek izmantota \texttt{XML} failu ģenerēšanai izvadfailu kartēšanā un  \texttt{pdf} failu ģenerēšanai, izmantojot to kā papildus pielikumu e-pastos vai nosūtot failu uz printēšanu rēķina saņemšanai pastkastē.
+\par \texttt{XML} faila ģenerēšanā tiek veidota izvadfailu kartēšana, kur pielietojot \texttt{XSLT} sintaksi, ir izveidoti noteiktie tagi, kas uzglabās klašu instanču mainīgo informāciju. Ģenerētie faili ir nepieciešami informācijas nosūtīšanai noteiktā formātā uz dažādiem faila maršrutēšanas kanāliem. \texttt{XML} faila ģenerēšanas piemērs:
+
+{
+\setstretch{1.0}
+\begin{minted}[xleftmargin=20pt,linenos,breaklines]{html}
+    <xsl:template match="Invoice">
+        <Invoice>
+            <ID>
+                <xsl:value-of select="@referenceId"/>
+            </ID>
+            <Date>
+                <xsl:value-of select="@creationDate"/>
+            </Date>
+            <Info>
+                <xsl:value-of select="@extraInfo"/>
+            </Info>
+        </Invoice>
+    </xsl:template>
+\end{minted}
+}
+
+\par Priekš \texttt{PDF} failu ģenerēšanas tiek izmantota \texttt{XSL-FO} (angl. Extensible Stylesheet Language - Formatting Objects) iezīmēšanas valoda (angl. markup language). Tiek izveidots \texttt{XSL-FO} fails priekš vizuāla rēķina izveides, kā veidne, kurā tiks ievietoti visi nepieciešamie dati. Paša \texttt{PDF} faila izveidei ir nepieciešams palaist izveidoto formātu caur \texttt{Apache FOP}\footnote{https://xmlgraphics.apache.org/fop/} (Formatting Objects Processor) formatētāju, kas pārveidos ielasītos datus lasāmā un printējamā failā.
+\par Zemāk redzamajā koda fragmentā ir redzams, kā tiek veidota \texttt{PDF} dokumenta galvene. Kods tiek dalīts vairākos šablonos (angl. template), pielietojot elementu \texttt{xsl:template}, kas var būt izsaukts citos šablonos, kā redzams 2.koda rindiņā, kur tiek izsaukts šablons ar kompānijas informāciju. Tālāk tiek pievienots formatējums ievietotajam statiskajam tekstam un datiem.
+
+{
+\setstretch{1.0}
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{html}
+    <xsl:template name="header">
+      <xsl:call-template name="CompanyInfo"/>
+        <fo:block-container absolute-position="absolute" left="106mm" top="25mm" font-size="9">
+            <fo:block font-weight="bold" font-size="15">
+                <fo:block>Rēķins</fo:block>
+            </fo:block>
+            <fo:block>
+                <fo:table>
+                    <fo:table-column column-number="1" column-width="45%"/>
+                    <fo:table-column column-number="2" column-width="55%"/>
+                    <fo:table-body>
+                        <fo:table-row font-weight="bold">
+                            <fo:table-cell>
+                                <fo:block>
+                                   Rēķina numurs
+                                </fo:block>
+                            </fo:table-cell>
+                            <fo:table-cell>
+                                <fo:block>
+                                    <xsl:value-of select="@referenceId"/>
+                                </fo:block>
+                            </fo:table-cell>
+                            ...
+\end{minted}
+}
+\par \ref{orig:pdf} attēlā ir redzams koda fragmenta rezultāts vizuālā veidā. Ievietotais logo pieder Fair Distribution kompānijai, kuras vadībā strādā darba autores prakses vietas uzņēmums. Vēstules saņēmēja adrese un vēstules atgriešanas adrese parauga atrādīšānas nolūkos ir aizvietotas ar testa datiem. Faila labajā pusē redzams tabulas veidā formatēts statiskais un dinamiskais teksts ar ievietotu informāciju par konkrēto rēķinu.
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[scale=0.5]{stylesheet.png}}
+    \caption{Izveidotā \texttt{PDF} faila galvene}
+    \label{orig:pdf}
+\end{figure}
+
 %     \item izmantotās tehnoloģijas
 %     \begin{itemize}
 %         \item apache groovy
